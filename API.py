@@ -1,6 +1,9 @@
 import os, sys, json, requests, configparser
 
-url = 'https://app.asana.com/api/1.0/tasks?project=1146674956832113&completed_since=now'
+devproj = '1150333541424865'
+prodproj = '1146674956832113'
+
+url = 'https://app.asana.com/api/1.0/tasks'
 key = ''
 config = configparser.ConfigParser()
 
@@ -24,8 +27,27 @@ if key == '':
     sys.exit()
 
 headers = {
+    'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Authorization': 'Bearer ' + key
     }
 
-print(json.dumps(json.loads(requests.get(url, headers=headers).text), indent=4, sort_keys=True))
+data = {
+    'data': {
+        'name': 'Test Task',
+        'projects': [
+            devproj
+        ]
+    }
+}
+data = json.dumps(data)
+
+subdata = {
+    'data': {
+        'name': 'Test Subtask'
+    }
+}
+subdata = json.dumps(subdata)
+
+parent = json.loads(requests.post(url, headers=headers, data=data).text)
+requests.post(url + '/{}/subtasks'.format(parent['data']['gid']), headers=headers, data=subdata)
