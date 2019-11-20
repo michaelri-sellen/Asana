@@ -45,31 +45,24 @@ def MobileTask(name, device, dtx = 'no', case = 'none'):
     data = json.dumps(data)
 
     parent = json.loads(requests.post(url, headers=headers, data=data).text)
+    SubTask(parent['data']['gid'], device, dtx, case, 'Replacement Ordered', 'Inventory Updated')
 
-    sub = {
-        'data': {
-            'name': device
+def SubTask(parent, *subs):
+    sublist = []
+    
+    for sub in subs:
+        if sub != 'no' and sub != 'none':
+            sublist.append(sub)
+    sublist.reverse()
+    
+    for sub in sublist:
+        data = {
+            'data': {
+                'name': sub
+            }
         }
-    }
+        data = json.dumps(data)
 
-    requests.post(url + '/{}/subtasks'.format(parent['data']['gid']), headers=headers, data=sub)
+        requests.post(url + '/{}/subtasks'.format(parent), headers=headers, data=data)
 
-data = {
-    'data': {
-        'name': 'Test Task',
-        'projects': [
-            project
-        ]
-    }
-}
-data = json.dumps(data)
-
-subdata = {
-    'data': {
-        'name': 'Test Subtask'
-    }
-}
-subdata = json.dumps(subdata)
-
-parent = json.loads(requests.post(url, headers=headers, data=data).text)
-requests.post(url + '/{}/subtasks'.format(parent['data']['gid']), headers=headers, data=subdata)
+MobileTask('Michael Rice', 'iPhone Plus', 'Data Transfer', 'Case: Defender')
