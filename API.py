@@ -2,6 +2,7 @@ import os, sys, json, requests, configparser
 
 devproj = '1150333541424865'
 prodproj = '1146674956832113'
+project = devproj
 
 url = 'https://app.asana.com/api/1.0/tasks'
 key = ''
@@ -32,11 +33,32 @@ headers = {
     'Authorization': 'Bearer ' + key
     }
 
+def MobileTask(name, device, dtx = 'no', case = 'none'):
+    data = {
+        'data': {
+            'name': name,
+            'projects': [
+                project
+            ]
+        }
+    }
+    data = json.dumps(data)
+
+    parent = json.loads(requests.post(url, headers=headers, data=data).text)
+
+    sub = {
+        'data': {
+            'name': device
+        }
+    }
+
+    requests.post(url + '/{}/subtasks'.format(parent['data']['gid']), headers=headers, data=sub)
+
 data = {
     'data': {
         'name': 'Test Task',
         'projects': [
-            devproj
+            project
         ]
     }
 }
